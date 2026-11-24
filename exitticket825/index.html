@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body style="margin:0">
+<title>Exit-Ticket 2.5</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* Layout: Karopapier wie die Lernseiten. Eine Spalte mit Werkzeugleiste (sticky), weiße Schreibfelder wie Papier, Selbsteinschätzung, PDF. */
+:root{
+  --paper:#f5f8fb; --grid:#dbe7ef; --surface:#ffffff; --ink:#1b2a44; --ink-2:#56657e; --line:#c6d4df;
+  --accent:#1f5fbf; --mark:#ffe36b; --mark-ink:#1b2a44; --red:#c4402f; --ok:#1f7d52; --ok-bg:#e3f4ea; --bad-bg:#fbe7e3;
+  --kh:#e3870b; --kv:#d6334a; --basis:#1f5fbf; --profi:#7646c0;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-math:"STIX Two Text", "Cambria Math", "Times New Roman", serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f151d; --grid:#1a2531; --surface:#16202d; --ink:#e3eaf4; --ink-2:#9aa8bc; --line:#2b3a4c;
+  --accent:#74a7f5; --mark:#e9c548; --mark-ink:#10161f; --red:#f0755f; --ok:#4fc28c; --ok-bg:#163327; --bad-bg:#3a1d19;
+  --kh:#f4a63a; --kv:#f2667a; --basis:#74a7f5; --profi:#b28ff1; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --paper:#0f151d; --grid:#1a2531; --surface:#16202d; --ink:#e3eaf4; --ink-2:#9aa8bc; --line:#2b3a4c;
+  --accent:#74a7f5; --mark:#e9c548; --mark-ink:#10161f; --red:#f0755f; --ok:#4fc28c; --ok-bg:#163327; --bad-bg:#3a1d19;
+  --kh:#f4a63a; --kv:#f2667a; --basis:#74a7f5; --profi:#b28ff1; color-scheme:dark; }
+
+
+
+[hidden]{display:none!important}
+body{background-color:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:10}
+.wrap{max-width:840px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 48px;display:grid;gap:16px}
+h1,h2{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.4rem,3.4vw,2rem);font-weight:800}
+h2{font-size:1.1rem;font-weight:800}
+p{margin:0}
+.eyebrow{font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+.hint{font-size:.9rem;color:var(--ink-2)}
+.m{font-family:var(--f-math)}
+i.v{font-family:var(--f-math);font-style:italic}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.tool{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700}
+.tool[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.dot{width:16px;height:16px;border-radius:50%}
+.sep{width:1px;align-self:stretch;background:var(--line);margin:0 4px}
+
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px}
+.qnum{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--surface);font-weight:800;margin-right:8px;font-size:.9rem}
+.qhead{display:flex;align-items:flex-start;gap:4px}
+.padrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+.lhs{font-family:var(--f-math);font-size:1.5rem}
+.padwrap{position:relative;display:grid;gap:4px}
+canvas.pad{display:block;width:100%;height:auto;border-radius:8px;border:1.5px solid var(--line);background:#ffffff;touch-action:pan-x pan-y pinch-zoom;cursor:crosshair;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.finger canvas.pad{touch-action:none}
+.lhs-t{font-size:1rem}
+.padrow3{display:grid;grid-template-columns:auto minmax(0,420px) auto;justify-content:start;gap:10px;align-items:center}
+.q1row{grid-template-columns:90px minmax(0,460px)}
+.q2row{grid-template-columns:110px minmax(0,1fr)}
+@media (max-width:520px){.q2row{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.q1row{grid-template-columns:minmax(0,1fr)}}
+.lhs i.v{font-size:1.5rem}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:20;background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:999px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.2);max-width:calc(100vw - 32px);text-align:center}
+.fingerset{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--ink-2)}
+.fingerset input{width:20px;height:20px}
+.padtools{display:flex;justify-content:flex-end}
+.mini{border:none;background:none;color:var(--ink-2);font-size:.85rem;text-decoration:underline;cursor:pointer;padding:2px 4px}
+
+.self{display:grid;gap:12px}
+.srow{display:grid;gap:8px;padding-bottom:6px}
+.self #selfRows{display:grid;gap:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;min-height:44px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer}
+.chip input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
+.chip.g input:checked + span{background:var(--ok-bg);border-color:var(--ok)}
+.chip.y input:checked + span{background:color-mix(in srgb,var(--mark) 45%,var(--surface));border-color:#b08a00}
+.chip.r input:checked + span{background:var(--bad-bg);border-color:var(--red)}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:10px 20px;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:#fff;font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.msg{font-weight:700}
+.msg.good{color:var(--ok)} .msg.bad{color:var(--red)}
+.ask{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.95rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:4px">
+    <span class="eyebrow">Mathematik · Exit-Ticket</span>
+    <h1>2.5 Direkte Proportionalität</h1>
+    <p class="hint">✏️ Schreibe <b>mit dem Stift</b> direkt in die weißen Felder. Mit dem Finger kannst du die Seite verschieben, aber nicht schreiben. Am Ende schätzt du dich selbst ein und speicherst dein Ticket als PDF.</p>
+  </header>
+
+  <div class="toolbar" role="toolbar" aria-label="Schreibwerkzeuge">
+    <button class="tool" data-tool="pen" data-color="#1b2a44" aria-pressed="true"><span class="dot" style="background:#1b2a44"></span>Stift</button>
+    <button class="tool" data-tool="pen" data-color="#1f5fbf" aria-pressed="false"><span class="dot" style="background:#1f5fbf"></span>Blau</button>
+    <button class="tool" data-tool="pen" data-color="#c4402f" aria-pressed="false"><span class="dot" style="background:#c4402f"></span>Rot</button>
+    <button class="tool" data-tool="eraser" aria-pressed="false">Radierer</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button class="tool" id="undo">↶ Rückgängig</button>
+  </div>
+
+  <section class="card">
+    <div class="qhead"><span class="qnum">1</span><p><b>Ergänze</b> den Merksatz: Gehört zum Doppelten der einen Größe <b>①&nbsp;…</b> der anderen Größe, so heißt die Zuordnung direkt proportional. Ihr Graph ist eine <b>②&nbsp;…</b>.</p></div>
+    <div class="padrow q1row"><span class="lhs-t">Lücke ①</span><div class="padwrap"><canvas class="pad" data-pad="luecke1" aria-label="Schreibfeld Lücke 1"></canvas><div class="padtools"><button class="mini" data-clear="luecke1">Feld leeren</button></div></div></div>
+    <div class="padrow q1row"><span class="lhs-t">Lücke ②</span><div class="padwrap"><canvas class="pad" data-pad="luecke2" aria-label="Schreibfeld Lücke 2"></canvas><div class="padtools"><button class="mini" data-clear="luecke2">Feld leeren</button></div></div></div>
+  </section>
+
+  <section class="card">
+    <div class="qhead"><span class="qnum">2</span><p>Für 6 Tassen Kinderpunsch braucht man 1,5 l Saft. Die Zuordnung <span style="white-space:nowrap">Anzahl Tassen <i class="v">x</i> → Saft <i class="v">y</i> in l</span> ist direkt proportional.<br>a) <b>Berechne</b> den Proportionalitätsfaktor <i class="v">m</i> und <b>gib</b> die Funktionsgleichung <b>an</b>.<br>b) <b>Berechne</b>, wie viel Saft man für 14 Tassen braucht.</p></div>
+    <div class="padwrap"><canvas class="pad" data-pad="rechnung" aria-label="Schreibfeld für deine Rechnung"></canvas><div class="padtools"><button class="mini" data-clear="rechnung">Feld leeren</button></div></div>
+    <div class="padrow q2row"><span class="lhs-t">a)&nbsp;<span class="lhs"><i class="v">y</i> =</span></span><div class="padwrap"><canvas class="pad" data-pad="gleichung" aria-label="Schreibfeld für die Funktionsgleichung"></canvas><div class="padtools"><button class="mini" data-clear="gleichung">Feld leeren</button></div></div></div>
+    <div class="padrow q2row"><span class="lhs-t">b)&nbsp;Antwort:</span><div class="padwrap"><canvas class="pad" data-pad="ergebnis" aria-label="Schreibfeld für die Antwort"></canvas><div class="padtools"><button class="mini" data-clear="ergebnis">Feld leeren</button></div></div></div>
+  </section>
+
+  <section class="card self">
+    <div class="qhead"><span class="qnum">3</span><p><b>Wie sicher bist du?</b> Tippe an, was für dich stimmt.</p></div>
+    <div id="selfRows"></div>
+  </section>
+
+  <section class="card">
+    <div class="actions">
+      <button class="btn" id="savePdf">Als PDF speichern</button>
+      <span class="msg" id="saveMsg" aria-live="polite"></span>
+    </div>
+    <p class="hint">Speichere dein PDF in deinem Mathe-Ordner. Vor der Schulaufgabe siehst du dort, wo du noch üben solltest.</p>
+    <label class="fingerset"><input type="checkbox" id="fingerOk"> Mein Stift wird nicht erkannt: Schreiben mit dem Finger erlauben</label>
+    <div class="ask"><button class="mini" id="resetAll">Alles löschen und neu beginnen</button><span id="resetAsk" hidden>Wirklich alles löschen? <button class="tool" id="resetYes">Ja, löschen</button> <button class="tool" id="resetNo">Abbrechen</button></span></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const TICKET = {
+  key: 'exit-ticket-2-5-v1',
+  title: 'Exit-Ticket · 2.5 Direkte Proportionalität',
+  file: 'Exit-Ticket 2.5 Direkte Proportionalität',
+  q1: 'Ergänze den Merksatz: Gehört zum Doppelten der einen Größe ① … der anderen Größe, so heißt die Zuordnung direkt proportional. Ihr Graph ist eine ② … .',
+  q2: 'Für 6 Tassen Kinderpunsch braucht man 1,5 l Saft. Die Zuordnung Anzahl Tassen x → Saft y in l ist direkt proportional. a) Berechne den Proportionalitätsfaktor m und gib die Funktionsgleichung an. b) Berechne, wie viel Saft man für 14 Tassen braucht.',
+  self: [
+    { id: 's1', text: 'Ich kann erkennen, ob eine Zuordnung direkt proportional ist (Quotientengleichheit, Ursprungsgerade).', tip: 'Erkennen: Arbeitsblatt „Direkte Proportionalität“, Abschnitt 1 (Merksatz, quotientengleich) und Abschnitt 2 (Graph); dann Aufgabe 1, 4 a) und 5. Lernseite Station 2, 3 und 6. Tipps und Lösungen: matecpg.github.io/mathe8/proportionalitaet/loesungen/#a1' },
+    { id: 's2', text: 'Ich kann den Proportionalitätsfaktor m berechnen, die Funktionsgleichung y = m · x angeben und fehlende Werte berechnen.', tip: 'Berechnen: Arbeitsblatt „Direkte Proportionalität“, Abschnitt 3 (Musterbeispiel 3 Vanillekipferl, Weg 1); dann Aufgabe 2 und 3. Lernseite Station 7. Tipps und Lösungen: matecpg.github.io/mathe8/proportionalitaet/loesungen/#a2 und #a3' },
+  ],
+};
+const LEVELS = [{ v: 'sicher', c: 'g', col: '#1f7d52', bg: '#e3f4ea' }, { v: 'mit Hilfe', c: 'y', col: '#8a6a00', bg: '#fff3c2' }, { v: 'noch nicht', c: 'r', col: '#c4402f', bg: '#fbe7e3' }];
+
+/* ---------- Speichern im Browser (nur Komfort) ---------- */
+let S = { pads: {}, self: {}, finger: false };
+try { const r = localStorage.getItem(TICKET.key); if (r) S = Object.assign(S, JSON.parse(r)); } catch (e) {}
+let saveT = null;
+const persist = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(TICKET.key, JSON.stringify(S)); } catch (e) {} }, 300); };
+
+/* ---------- Schreibfelder ---------- */
+// Logische Größe je Feld (Breite 1000 bzw. Feldbreite), Hintergrund wie Papier
+const PADS = {
+  luecke1:  { w: 600, h: 120, bg: 'line' },
+  luecke2:  { w: 600, h: 120, bg: 'line' },
+  rechnung: { w: 1000, h: 450, bg: 'karo' },
+  gleichung: { w: 1000, h: 130, bg: 'line' },
+  ergebnis: { w: 1000, h: 130, bg: 'line' },
+};
+let tool = { kind: 'pen', color: '#1b2a44' };
+const undoStack = [];
+function drawBg(ctx, P){
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, P.w, P.h);
+  ctx.strokeStyle = '#dbe5ee'; ctx.lineWidth = 1.2;
+  if (P.bg === 'karo') { for (let x = 25; x < P.w; x += 25) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, P.h); ctx.stroke(); } for (let y = 25; y < P.h; y += 25) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(P.w, y); ctx.stroke(); } }
+  if (P.bg === 'frac') { ctx.strokeStyle = '#7a8aa0'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(40, P.h / 2); ctx.lineTo(P.w - 40, P.h / 2); ctx.stroke(); }
+  if (P.bg === 'line') { ctx.strokeStyle = '#7a8aa0'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(20, P.h - 28); ctx.lineTo(P.w - 20, P.h - 28); ctx.stroke(); }
+}
+function drawStroke(ctx, st){
+  const pts = st.p; if (!pts.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = st.e ? 'destination-out' : 'source-over';
+  ctx.strokeStyle = st.c || '#000'; ctx.fillStyle = st.c || '#000';
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (pts.length === 1) { ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], (st.e ? 14 : 2.2), 0, Math.PI * 2); ctx.fill(); ctx.restore(); return; }
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0, p0] = pts[i - 1], [x1, y1, p1] = pts[i];
+    ctx.lineWidth = st.e ? 28 : 2.2 + 3.2 * ((p0 + p1) / 2);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  }
+  ctx.restore();
+}
+// Ink liegt auf eigener Ebene, damit der Radierer das Papier nicht löscht
+function renderInk(id){
+  const P = PADS[id], L = P.ink;
+  L.ctx.clearRect(0, 0, P.w, P.h);
+  (S.pads[id] || []).forEach(st => drawStroke(L.ctx, st));
+}
+function compose(id, ctx, scale = 1){
+  const P = PADS[id];
+  ctx.save(); ctx.scale(scale, scale); drawBg(ctx, P); ctx.restore();
+  ctx.drawImage(P.ink.cv, 0, 0, P.w, P.h, 0, 0, P.w * scale, P.h * scale);
+}
+function paint(id){
+  const P = PADS[id], cv = P.cv, ctx = cv.getContext('2d');
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+  compose(id, ctx, cv.width / P.w);
+}
+function setupPad(cv){
+  const id = cv.dataset.pad, P = PADS[id];
+  P.cv = cv;
+  const ink = document.createElement('canvas'); ink.width = P.w; ink.height = P.h;
+  P.ink = { cv: ink, ctx: ink.getContext('2d') };
+  const resize = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 3), w = cv.clientWidth || P.w;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(w * dpr * P.h / P.w);
+    cv.style.aspectRatio = `${P.w} / ${P.h}`;
+    paint(id);
+  };
+  cv.style.aspectRatio = `${P.w} / ${P.h}`;
+  new ResizeObserver(resize).observe(cv);
+  let cur = null;
+  let activeId = null;
+  const pos = e => { const r = cv.getBoundingClientRect(); return [ (e.clientX - r.left) * P.w / r.width, (e.clientY - r.top) * P.h / r.height, e.pressure && e.pointerType === 'pen' ? e.pressure : 0.45 ]; };
+  cv.addEventListener('pointerdown', e => {
+    if (e.button > 0) return;
+    // Nur Stift (und Maus am PC). Finger scrollt die Seite und wird als Handballen ignoriert.
+    if (e.pointerType === 'touch' && !S.finger) { fingerHint(); return; }
+    if (cur) return;
+    if (e.pointerType === 'pen') penDown = true;
+    activeId = e.pointerId;
+    e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    cur = { c: tool.color, e: tool.kind === 'eraser' ? 1 : 0, p: [pos(e)].map(a => a.map(n => Math.round(n * 10) / 10)) };
+    (S.pads[id] = S.pads[id] || []).push(cur); undoStack.push(id);
+    drawStroke(P.ink.ctx, cur); paint(id);
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!cur || e.pointerId !== activeId) return; e.preventDefault();
+    const co = e.getCoalescedEvents ? e.getCoalescedEvents() : []; const evs = co.length ? co : [e];
+    evs.forEach(ev => cur.p.push(pos(ev).map(n => Math.round(n * 10) / 10)));
+    renderInk(id); paint(id);
+  });
+  // iPad: Stift darf die Seite nicht scrollen (Touch-Ereignis des Stifts abfangen)
+  cv.addEventListener('touchstart', e => { const st = [...e.changedTouches].some(t => t.touchType === 'stylus'); if (st || penDown || S.finger) e.preventDefault(); }, { passive: false });
+  cv.addEventListener('touchmove', e => { const st = [...e.changedTouches].some(t => t.touchType === 'stylus'); if (st || penDown || (S.finger && cur)) e.preventDefault(); }, { passive: false });
+  const end = e => { if (e.pointerId !== activeId) return; penDown = false; activeId = null; if (cur) { cur = null; persist(); } };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end); cv.addEventListener('lostpointercapture', end);
+  renderInk(id); resize();
+}
+let penDown = false, toastT = null, lastHint = 0;
+function fingerHint(){
+  const now = Date.now(); if (now - lastHint < 2500) return; lastHint = now;
+  let t = document.querySelector('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.append(t); }
+  t.textContent = '✏️ Bitte schreibe mit dem Stift. Mit dem Finger kannst du nur scrollen.'; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600);
+}
+document.body.classList.toggle('finger', !!S.finger);
+$$('canvas.pad').forEach(setupPad);
+$('#fingerOk').checked = !!S.finger;
+$('#fingerOk').addEventListener('change', e => { S.finger = e.target.checked; document.body.classList.toggle('finger', S.finger); persist(); });
+
+$$('.tool[data-tool]').forEach(b => b.addEventListener('click', () => {
+  $$('.tool[data-tool]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  tool = { kind: b.dataset.tool, color: b.dataset.color || null };
+}));
+$('#undo').addEventListener('click', () => {
+  const id = undoStack.pop() || Object.keys(PADS).reverse().find(k => (S.pads[k] || []).length);
+  if (!id || !(S.pads[id] || []).length) return;
+  S.pads[id].pop(); renderInk(id); paint(id); persist();
+});
+$$('[data-clear]').forEach(b => b.addEventListener('click', () => {
+  const id = b.dataset.clear; S.pads[id] = []; renderInk(id); paint(id); persist();
+}));
+
+/* ---------- Selbsteinschätzung ---------- */
+$('#selfRows').innerHTML = TICKET.self.map(s => `<div class="srow"><p>${s.text}</p><div class="chips" role="radiogroup" aria-label="${s.text}">${LEVELS.map(l =>
+  `<label class="chip ${l.c}"><input type="radio" name="${s.id}" value="${l.v}" ${S.self[s.id] === l.v ? 'checked' : ''}><span>${l.v}</span></label>`).join('')}</div></div>`).join('');
+$$('#selfRows input').forEach(i => i.addEventListener('change', () => { S.self[i.name] = i.value; persist(); }));
+
+/* ---------- Alles löschen ---------- */
+$('#resetAll').addEventListener('click', () => { $('#resetAsk').hidden = false; });
+$('#resetNo').addEventListener('click', () => { $('#resetAsk').hidden = true; });
+$('#resetYes').addEventListener('click', () => {
+  S = { pads: {}, self: {}, finger: S.finger }; persist(); undoStack.length = 0;
+  Object.keys(PADS).forEach(id => { renderInk(id); paint(id); });
+  $$('#selfRows input').forEach(i => i.checked = false); $('#resetAsk').hidden = true;
+});
+
+/* ---------- PDF ---------- */
+function wrapText(ctx, text, x, y, maxW, lh, dry){
+  const words = text.split(' '); let line = '';
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { if (!dry) ctx.fillText(line, x, y); y += lh; line = w; } else line = t; }
+  if (line) { if (!dry) ctx.fillText(line, x, y); y += lh; }
+  return y;
+}
+async function buildPage(){
+  try { await document.fonts.ready; } catch (e) {}
+  const Wp = 1240, Hp = 1754, M = 90, CW = Wp - 2 * M;
+  const c = document.createElement('canvas'); c.width = Wp; c.height = Hp; const x = c.getContext('2d');
+  const body = '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif', disp = '"Bricolage Grotesque", "Segoe UI", Arial, sans-serif', math = '"STIX Two Text", "Times New Roman", serif';
+  x.fillStyle = '#fff'; x.fillRect(0, 0, Wp, Hp); x.textBaseline = 'alphabetic';
+  let y = M + 30;
+  x.fillStyle = '#1b2a44'; x.font = `800 38px ${disp}`; x.fillText(TICKET.title, M, y);
+  const d = new Date(); const ds = d.toLocaleDateString('de-DE');
+  y += 40; x.font = `400 24px ${body}`; x.fillStyle = '#56657e'; x.fillText('Datum: ' + ds, M, y);
+  y += 22; x.strokeStyle = '#c6d4df'; x.lineWidth = 2; x.beginPath(); x.moveTo(M, y); x.lineTo(Wp - M, y); x.stroke(); y += 50;
+  const qhead = (n, t) => { x.fillStyle = '#1b2a44'; x.beginPath(); x.arc(M + 18, y - 9, 18, 0, Math.PI * 2); x.fill(); x.fillStyle = '#fff'; x.font = `800 22px ${body}`; x.textAlign = 'center'; x.fillText(n, M + 18, y - 1); x.textAlign = 'left'; x.fillStyle = '#1b2a44'; x.font = `400 26px ${body}`; y = wrapText(x, t, M + 50, y, CW - 50, 36); };
+  const pad = (id, px, w) => { const P = PADS[id], h = w * P.h / P.w; x.save(); x.translate(px, y); compose(id, x, w / P.w); x.restore(); x.strokeStyle = '#c6d4df'; x.lineWidth = 2; x.strokeRect(px, y, w, h); y += h; };
+  qhead('1', TICKET.q1); y += 16;
+  const row1 = (lab1, lab2, id) => { x.font = `400 24px ${body}`; x.fillStyle = '#1b2a44'; x.fillText(lab1, M + 50, y + 50); if (lab2) x.fillText(lab2, M + 50, y + 92); pad(id, M + 200, 400); y += 14; };
+  { const y0 = y; x.font = `400 24px ${body}`; x.fillStyle = '#1b2a44'; x.fillText('Lücke ①', M + 50, y + 50); pad('luecke1', M + 160, 360); y = y0;
+    x.font = `400 24px ${body}`; x.fillStyle = '#1b2a44'; x.fillText('Lücke ②', M + 560, y + 50); pad('luecke2', M + 670, 360); y += 50; }
+  qhead('2', TICKET.q2); y += 14;
+  pad('rechnung', M, 600); y += 14;
+  x.font = `400 26px ${body}`; x.fillStyle = '#1b2a44'; x.fillText('a)', M, y + 56); x.font = `italic 36px ${math}`; x.fillText('y', M + 40, y + 56); x.font = `36px ${math}`; x.fillText('=', M + 66, y + 56);
+  pad('gleichung', M + 160, 600); y += 10;
+  x.font = `400 26px ${body}`; x.fillStyle = '#1b2a44'; x.fillText('b) Antwort:', M, y + 56);
+  pad('ergebnis', M + 160, 600); y += 40;
+  qhead('3', 'Meine Selbsteinschätzung'); y += 10;
+  const colW = 150, tX = M + 50, chipX = Wp - M - colW * 3;
+  LEVELS.forEach((l, k) => { x.font = `700 22px ${body}`; x.fillStyle = '#56657e'; x.textAlign = 'center'; x.fillText(l.v, chipX + colW * k + colW / 2, y); });
+  x.textAlign = 'left'; y += 16;
+  TICKET.self.forEach(s => {
+    const v = S.self[s.id];
+    x.font = `400 24px ${body}`;
+    const nl = Math.round((wrapText(x, s.text, 0, 0, chipX - tX - 24, 32, true)) / 32), rowH = Math.max(64, nl * 32 + 28);
+    x.strokeStyle = '#c6d4df'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(tX, y); x.lineTo(Wp - M, y); x.stroke();
+    x.fillStyle = '#1b2a44'; wrapText(x, s.text, tX, y + (rowH - nl * 32) / 2 + 24, chipX - tX - 24, 32);
+    LEVELS.forEach((l, k) => {
+      const cx = chipX + colW * k + colW / 2, cy = y + rowH / 2, on = v === l.v;
+      x.beginPath(); x.arc(cx, cy, 16, 0, Math.PI * 2);
+      x.fillStyle = on ? l.col : '#ffffff'; x.fill(); x.lineWidth = 2.5; x.strokeStyle = on ? l.col : '#9aa8bc'; x.stroke();
+      if (on) { x.strokeStyle = '#fff'; x.lineWidth = 4; x.beginPath(); x.moveTo(cx - 7, cy); x.lineTo(cx - 2, cy + 6); x.lineTo(cx + 8, cy - 6); x.stroke(); }
+    });
+    y += rowH;
+  });
+  x.strokeStyle = '#c6d4df'; x.beginPath(); x.moveTo(tX, y); x.lineTo(Wp - M, y); x.stroke(); y += 50;
+  // Übungshinweise
+  const need = TICKET.self.filter(s => S.self[s.id] && S.self[s.id] !== 'sicher');
+  const open = TICKET.self.filter(s => !S.self[s.id]);
+  const head = need.length ? 'Hier solltest du vor der Schulaufgabe üben:' : open.length ? 'Selbsteinschätzung noch nicht vollständig.' : 'Super – hier fühlst du dich sicher!';
+  const lines = need.length ? need.map(s => '• ' + s.tip) : open.length ? ['Tippe bei jedem Satz an, wie sicher du bist, und speichere das PDF noch einmal.'] : ['Wiederhole trotzdem kurz Musterbeispiel 3 auf dem Arbeitsblatt „Direkte Proportionalität“, bevor die Schulaufgabe kommt.'];
+  x.font = `400 23px ${body}`;
+  let hgt = 40; lines.forEach(t => { hgt = wrapText(x, t, 0, hgt, CW - 48, 32, true); });
+  const boxY = y - 34;
+  x.fillStyle = need.length ? '#fff3c2' : open.length ? '#eef2f6' : '#e3f4ea'; x.fillRect(M, boxY, CW, hgt + 30);
+  let yy = y; x.font = `800 26px ${disp}`; x.fillStyle = '#1b2a44'; x.fillText(head, M + 24, yy); yy += 40;
+  x.font = `400 23px ${body}`; lines.forEach(t => { yy = wrapText(x, t, M + 24, yy, CW - 48, 32); });
+  x.font = `400 18px ${body}`; x.fillStyle = '#9aa8bc'; x.fillText('Direkte Proportionalität · Kapitel 2.5 · Exit-Ticket', M, Hp - 36);
+  return { canvas: c, date: d };
+}
+async function savePdf(){
+  const msg = $('#saveMsg'); msg.className = 'msg'; msg.textContent = 'PDF wird erstellt …';
+  const filled = Object.values(S.pads).some(a => a && a.length);
+  const { canvas, date } = await buildPage();
+  const iso = date.toISOString().slice(0, 10);
+  const name = `${TICKET.file} ${iso}.pdf`;
+  let blob = null;
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297);
+    blob = pdf.output('blob');
+  } catch (e) { blob = null; }
+  if (!blob) { msg.className = 'msg bad'; msg.textContent = 'Das PDF konnte nicht erstellt werden. Prüfe deine Internetverbindung und versuche es noch einmal.'; return; }
+  // In Claude: über den Download-Dialog; sonst normaler Download
+  let dl = null;
+  try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+  try {
+    if (dl) { await dl.save({ filename: name, data: blob }); }
+    else {
+      const url = URL.createObjectURL(blob); const a = document.createElement('a');
+      a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 20000);
+    }
+    msg.className = 'msg good'; msg.textContent = filled ? 'Dein PDF ist fertig. Speichere es in deinem Mathe-Ordner.' : 'Dein PDF ist fertig – allerdings hast du noch nichts geschrieben.';
+  } catch (e) {
+    msg.className = 'msg bad'; msg.textContent = e && e.code === 'declined' ? 'Speichern abgebrochen.' : 'Speichern hat nicht geklappt. Versuche es noch einmal.';
+  }
+}
+$('#savePdf').addEventListener('click', savePdf);
+})();
+</script>
+
+</body>
+</html>
